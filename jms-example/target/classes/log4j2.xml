@@ -25,42 +25,42 @@
 
 		<!-- Http Logger shows wire traffic on DEBUG -->
 		<AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger"
-			level="DEBUG">
+			level="INFO">
 		</AsyncLogger>
 
 		<!-- JDBC Logger shows queries and parameters values on DEBUG -->
 		<AsyncLogger name="com.mulesoft.mule.transport.jdbc"
-			level="DEBUG">
+			level="INFO">
 		</AsyncLogger>
 
 		<!-- CXF is used heavily by Mule for web services -->
-		<AsyncLogger name="org.apache.cxf" level="DEBUG">
+		<AsyncLogger name="org.apache.cxf" level="INFO">
 		</AsyncLogger>
 
 		<!-- Apache Commons tend to make a lot of noise which can clutter the log -->
-		<AsyncLogger name="org.apache" level="DEBUG">
+		<AsyncLogger name="org.apache" level="INFO">
 		</AsyncLogger>
 
 		<!-- Reduce startup noise -->
 		<AsyncLogger name="org.springframework.beans.factory"
-			level="DEBUG">
+			level="INFO">
 		</AsyncLogger>
 
 		<!-- Mule classes -->
-		<AsyncLogger name="org.mule" level="DEBUG">
+		<AsyncLogger name="org.mule" level="INFO">
 		</AsyncLogger>
 
-		<AsyncLogger name="com.mulesoft" level="DEBUG">
+		<AsyncLogger name="com.mulesoft" level="INFO">
 		</AsyncLogger>
 
 		<!-- Reduce DM verbosity -->
-		<AsyncLogger name="org.jetel" level="DEBUG">
+		<AsyncLogger name="org.jetel" level="INFO">
 		</AsyncLogger>
 
-		<AsyncLogger name="Tracking" level="DEBUG">
+		<AsyncLogger name="Tracking" level="INFO">
 		</AsyncLogger>
 
-		<AsyncRoot level="DEBUG">
+		<AsyncRoot level="INFO">
 			<AppenderRef ref="file" />
 		</AsyncRoot>
 	</Loggers>
