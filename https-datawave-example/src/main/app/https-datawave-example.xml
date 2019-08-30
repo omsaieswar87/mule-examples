@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="localhost" port="8081" doc:name="HTTP Request Configuration">
+        <tls:context>
+            <tls:trust-store path="truststore/truststore.ts" password="omsaieswar" insecure="true"/>
+        </tls:context>
+    </http:request-config>
+    <flow name="https-datawave-exampleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/test" allowedMethods="get" doc:name="HTTP"/>
+        <logger message="Https request" level="INFO" doc:name="Logger"/>
+        <set-payload value="Return from Https" doc:name="Set Payload"/>
+    </flow>
+    <flow name="https-datawave-exampleFlow1">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/testtruststore" allowedMethods="get" doc:name="HTTP"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="/secure/test" method="GET" doc:name="HTTP"/>
+    </flow>
+</mule>

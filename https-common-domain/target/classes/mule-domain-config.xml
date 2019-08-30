@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain:mule-domain xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:domain="http://www.mulesoft.org/schema/mule/ee/domain"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+        xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/ee/domain http://www.mulesoft.org/schema/mule/ee/domain/current/mule-domain-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" protocol="HTTPS" host="localhost" port="8081" basePath="/secure" doc:name="HTTP Listener Configuration">
+        <tls:context>
+            <tls:key-store type="jks" path="keystore/keystore.jks" alias="mule" keyPassword="omsaieswar" password="omsaieswar"/>
+        </tls:context>
+    </http:listener-config>
+
+    <!-- configure here resource to be shared within the domain -->
+
+</domain:mule-domain>
