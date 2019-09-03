@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081" basePath="/datawave" doc:name="HTTP Listener Configuration"/>
+    <flow name="datawave-groupbyFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/groupby" allowedMethods="post" doc:name="HTTP"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="d04e1183-0324-40dd-9ba4-8740953b0630">
+            <dw:input-payload doc:sample="D:\mule\example.xml" mimeType="application/xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json duplicateKeyAsArray=false
+---
+"products_info": payload.catalog.product  
+groupBy $.catalog_item.price pluck {
+	
+	price: $$,
+	items:$.catalog_item.item_number,
+	size: $.catalog_item.*size.@description,
+	gender:$.catalog_item.@gender
+	
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+</mule>
