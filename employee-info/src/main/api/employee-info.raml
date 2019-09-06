@@ -1,0 +1,12 @@
+#%RAML 0.8
+title: Employee Information
+version: 1.0
+
+traits: !include traits/response.yaml
+
+/info:
+  get:
+    description: Display the list of all employees
+    is: [responseMessage]
+          
+            

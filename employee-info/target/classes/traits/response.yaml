@@ -1,0 +1,34 @@
+- responseMessage:
+      responses:
+        200:
+          body:
+            application/json:
+              example: |
+                  [
+                      {
+                        "eid": 12345,
+                        "ename": "eswar1",
+                        "esalary": "120000",
+                        "address" : {
+                            "permenent": {
+                              "Street": "Ponniamman nagar",
+                              "Door No" : "5/338 A",
+                              "Area":"medavakam",
+                              "City" : "Chennai",
+                              "State" : "Tamilnadu",
+                              "Country":"India",
+                              "pincode":"600100"
+
+                            }, 
+                            "present": {
+                              "Street": "Kalpana Nagr",
+                              "Door No" : "18-368/3 SF4",
+                              "Area": "Kanuru",
+                              "City" : "Vijayawada",
+                              "State" : "Andhra Pradesh",
+                              "Country":"India",
+                              "pincode":"520007"
+                            }
+                        }
+                        }
+                    ]
