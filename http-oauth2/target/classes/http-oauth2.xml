@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2" 
+<mule xmlns:oauth2="http://www.mulesoft.org/schema/mule/oauth2"
 	xmlns:http="http://www.mulesoft.org/schema/mule/http"
 	xmlns:oauth2-provider="http://www.mulesoft.org/schema/mule/oauth2-provider"
 	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core"
@@ -12,19 +12,29 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
 http://www.mulesoft.org/schema/mule/oauth2-provider http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd
 http://www.mulesoft.org/schema/mule/oauth2 http://www.mulesoft.org/schema/mule/oauth2/current/mule-oauth2.xsd">
-    <http:listener-config name="HTTP_Listener_Configuration" host="localhost" port="8081"  doc:name="HTTP Listener Configuration"/>
-    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="api.github.com" port="443"  doc:name="HTTP Request Configuration">
-        <oauth2:authorization-code-grant-type clientId="cb9d9cce1b756fe473e2" clientSecret="85f83e215e70c95669b2d4fc5ac61d78968b0035" redirectionUrl="http://localhost:8081/callback">
-            <oauth2:authorization-request authorizationUrl="https://github.com/login/oauth/authorize" localAuthorizationUrl="http://localhost:8081/login"/>
-            <oauth2:token-request tokenUrl="https://github.com/login/oauth/access_token">
-                <oauth2:token-response accessToken="#[payload.access_token]" refreshToken="#[payload.refresh_token]"/>
-            </oauth2:token-request>
-        </oauth2:authorization-code-grant-type>
-    </http:request-config>
-    <flow name="http-oauth2Flow" processingStrategy="non-blocking">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="/users" doc:name="HTTP"/>
-        <http:request config-ref="HTTP_Request_Configuration" path="/" method="GET" doc:name="HTTP"/>
-        <logger message="#[message]" level="INFO" doc:name="Logger"/>
-        <set-payload value="My Employee resource object" doc:name="Set Payload"/>
-    </flow>
+	<http:listener-config name="HTTP_Listener_Configuration"
+		host="localhost" port="8081" doc:name="HTTP Listener Configuration" />
+	<http:request-config name="HTTP_Request_Configuration"
+		protocol="HTTPS" host="api.github.com" port="443"
+		doc:name="HTTP Request Configuration">
+		<oauth2:authorization-code-grant-type
+			clientId="cb9d9cce1b756fe473e2" clientSecret="85f83e215e70c95669b2d4fc5ac61d78968b0035"
+			redirectionUrl="http://localhost:8081/callback">
+			<oauth2:authorization-request
+				authorizationUrl="https://github.com/login/oauth/authorize"
+				localAuthorizationUrl="http://localhost:8081/login" />
+			<oauth2:token-request tokenUrl="https://github.com/login/oauth/access_token" >
+				<oauth2:token-response accessToken="#[payload.access_token]"
+					refreshToken="#[payload.refresh_token]" />
+			</oauth2:token-request>
+		</oauth2:authorization-code-grant-type>
+	</http:request-config>
+	<flow name="http-oauth2Flow" processingStrategy="non-blocking">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/users" doc:name="HTTP" />
+		<http:request config-ref="HTTP_Request_Configuration"
+			path="/" method="GET" doc:name="HTTP" />
+		<logger message="#[message]" level="INFO" doc:name="Logger" />
+		<set-payload value="My Employee resource object" doc:name="Set Payload" />
+	</flow>
 </mule>
