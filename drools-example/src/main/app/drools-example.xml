@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw"
+	xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:bpm="http://www.mulesoft.org/schema/mule/bpm" xmlns:json="http://www.mulesoft.org/schema/mule/json"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd 
+http://www.mulesoft.org/schema/mule/bpm http://www.mulesoft.org/schema/mule/bpm/current/mule-bpm.xsd">
+
+	<spring:beans>
+		<spring:bean name="NoFactsBean" class="java.util.ArrayList" />
+	</spring:beans>
+	
+	<http:listener-config name="HTTP_Listener_Configuration"
+		host="localhost" port="8081" basePath="/drools" doc:name="HTTP Listener Configuration" />
+	<bpm:drools/>
+	<flow name="drools-exampleFlow">
+		<http:listener config-ref="HTTP_Listener_Configuration"
+			path="/example" allowedMethods="POST" doc:name="HTTP" />
+		<dw:transform-message doc:name="Transform Message">
+			<dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload]]></dw:set-payload>
+		</dw:transform-message>
+		<flow-ref name="drools-exampleFlow1" doc:name="Flow Reference" />
+	</flow>
+	<flow name="drools-exampleFlow1" processingStrategy="synchronous">
+		<foreach collection="#[payload]" doc:name="For Each">
+			<json:json-to-object-transformer
+				returnClass="com.exp.Example" doc:name="JSON to Object" />
+			<bpm:rules rulesDefinition="example.drl" initialFacts-ref="NoFactsBean"
+				doc:name="BPMRules" />
+			<set-payload value="#[payload.object]" doc:name="Set Payload" />
+			<json:object-to-json-transformer
+				doc:name="Object to JSON" />
+			<logger level="INFO" doc:name="Logger" />
+		</foreach>
+        <collection-aggregator failOnTimeout="true" doc:name="Collection Aggregator"/>
+		<logger level="INFO" doc:name="Logger" />
+	</flow>
+</mule>

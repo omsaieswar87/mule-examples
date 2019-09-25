@@ -1,0 +1,57 @@
+package com.exp;
+import org.mule.MessageExchangePattern;
+import com.exp.Example;
+global org.mule.module.bpm.MessageService mule;
+dialect "mvel"
+
+declare Insurance
+@role('event')
+end
+
+rule "Status Inforce"
+lock-on-active when
+$example: Example(status == "Inforce") then
+modify($example) {
+setSalary(20000)
+}
+end
+
+rule "Status Created"
+lock-on-active when
+$example: Example(status == "Created") then
+modify($example) {
+setSalary(30000)
+}
+end
+
+rule "Status Expired"
+lock-on-active when
+$example: Example(status == "Expired") then
+modify($example) {
+setSalary(40000)
+}
+end
+
+rule "Status Paused"
+lock-on-active when
+$example: Example(status == "Paused") then
+modify($example) {
+setSalary(21000)
+}
+end
+
+rule "Status Dropped"
+lock-on-active when
+$example: Example(status == "Dropped") then
+modify($example) {
+setSalary(31000)
+}
+end
+
+rule "Status Claimed"
+lock-on-active when
+$example: Example(status == "Claimed") then
+modify($example) {
+setSalary(41000)
+}
+end
