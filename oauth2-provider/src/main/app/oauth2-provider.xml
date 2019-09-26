@@ -13,6 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.mulesoft.org/schema/mule/oauth2-provider http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd
 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
+
 	<spring:beans>
 		<spring:bean name="clientObjectStore"
 			class="org.mule.util.store.InMemoryObjectStore" />
@@ -39,7 +40,8 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		<ss:authentication-manager id="resourceOwnerAuthenticationManager">
 			<ss:authentication-provider>
 				<ss:user-service id="resourceOwnerUserService">
-					<ss:user name="${app.resource.user.name}" password="${app.resource.user.paswword}" authorities="${app.resource.authorities}" />
+					<ss:user name="${app.resource.user.name}" password="${app.resource.user.paswword}"
+						authorities="${app.resource.authorities}" />
 				</ss:user-service>
 			</ss:authentication-provider>
 		</ss:authentication-manager>
@@ -47,46 +49,40 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 		<ss:authentication-manager id="clientAuthenticationManager">
 			<ss:authentication-provider>
 				<ss:user-service id="clientUserService">
-					<ss:user name="${app.client.user.name}" password="${app.client.user.password}" authorities="${app.client.authorities}"  />
+					<ss:user name="${app.client.user.name}" password="${app.client.user.password}"
+						authorities="${app.client.authorities}" />
 				</ss:user-service>
 			</ss:authentication-provider>
 		</ss:authentication-manager>
 	</spring:beans>
 
-	<mule-ss:security-manager name="_muleSecurityManager">
+	<mule-ss:security-manager name="_muleSecurityManager"
+		doc:name="Spring Security Provider">
 		<mule-ss:delegate-security-provider
-			name="clientSecurityProvider" delegate-ref="clientAuthenticationManager"  />
+			name="clientSecurityProvider" delegate-ref="clientAuthenticationManager" />
 		<mule-ss:delegate-security-provider
-			name="resourceOwnerSecurityProvider" delegate-ref="resourceOwnerAuthenticationManager"  />
+			name="resourceOwnerSecurityProvider" delegate-ref="resourceOwnerAuthenticationManager" />
 	</mule-ss:security-manager>
 
-	<http:listener-config name="listenerConfig" host="${app.hostname}" port="${app.http.port}" />
+	<http:listener-config name="listenerConfig" host="${app.hostname}"
+		port="${app.http.port}" doc:name="HTTP Listener Configuration" />
 
 	<oauth2-provider:config name="OAuth2Provider"
-		providerName="Test OAuth2Provider"
-		authorizationEndpointPath="${app.authorization.endpoint}" 
-		accessTokenEndpointPath="${app.token.endpoint}"
-		listenerConfig-ref="listenerConfig" 
+		providerName="Test OAuth2Provider" authorizationEndpointPath="${app.authorization.endpoint}"
+		accessTokenEndpointPath="${app.token.endpoint}" listenerConfig-ref="listenerConfig"
 		resourceOwnerSecurityProvider-ref="resourceOwnerSecurityProvider"
-		clientSecurityProvider-ref="clientSecurityProvider" 
-		clientStore-ref="clientStore"
-		tokenStore-ref="tokenStore" 
-		authorizationCodeStore-ref="authorizationCodeStore"
-		scopes="${app.scopes}"
-		defaultScopes="${app.scopes}"
+		clientSecurityProvider-ref="clientSecurityProvider" clientStore-ref="clientStore"
+		tokenStore-ref="tokenStore" authorizationCodeStore-ref="authorizationCodeStore"
+		scopes="${app.scopes}" defaultScopes="${app.scopes}"
 		supportedGrantTypes="${app.client.authorization.grant.types}"
-		authorizationTtlSeconds="${app.token.authorization.ttl.seconds}" 
-		tokenTtlSeconds="${app.token.ttl.seconds}"
-		refreshTokenTtlSeconds="${app.token.refresh.token.ttl.seconds}" 
+		authorizationTtlSeconds="${app.token.authorization.ttl.seconds}"
+		tokenTtlSeconds="${app.token.ttl.seconds}" refreshTokenTtlSeconds="${app.token.refresh.token.ttl.seconds}"
 		enableRefreshToken="${app.token.enable.refresh.token}"
-		issueNewRefreshToken="${app.token.issuenew.refresh.token}">
+		issueNewRefreshToken="${app.token.issuenew.refresh.token}" doc:name="OAuth provider module">
 
 		<oauth2-provider:clients>
-			<oauth2-provider:client 
-				clientId="${app.clientid}"
-				secret="${app.clientsecret}" 
-				principal="clusr" 
-				
+			<oauth2-provider:client clientId="${app.clientid}"
+				secret="${app.clientsecret}" principal="clusr" clientName="Own Oauth"
 				type="${app.clinet.type}">
 				<oauth2-provider:redirect-uris>
 					<oauth2-provider:redirect-uri>${app.redirect.url}</oauth2-provider:redirect-uri>
@@ -97,12 +93,27 @@ http://www.springframework.org/schema/security http://www.springframework.org/sc
 			</oauth2-provider:client>
 		</oauth2-provider:clients>
 	</oauth2-provider:config>
+	<http:request-config name="HTTP_Request_Configuration"
+		host="localhost" port="8081" doc:name="HTTP Request Configuration" />
 
 	<flow name="protected-resource-flow">
-		<http:listener config-ref="listenerConfig" path="protected" />
-		<oauth2-provider:validate config-ref="OAuth2Provider" scopes="${app.protected.flow.scope}"  resourceOwnerRoles="${app.protected.flow.resource_owner}"/>
-		<set-payload value="Welcome OAuth 2" />
+		<http:listener config-ref="listenerConfig" path="validate"
+			doc:name="HTTP" />
+		<oauth2-provider:validate config-ref="OAuth2Provider"
+			scopes="${app.protected.flow.scope}" resourceOwnerRoles="${app.protected.flow.resource_owner}"
+			doc:name="OAuth provider module" />
+		<logger message="#[message]" level="INFO" doc:name="Logger" />
+		<set-payload value="OAuth 2 +Validated" doc:name="Set Payload" />
 	</flow>
-
+	<flow name="oauth2-providerFlow">
+		<http:listener config-ref="listenerConfig" path="/getCode"
+			allowedMethods="GET" doc:name="HTTP" />
+		<set-payload
+			value="{
+&quot;code&quot;:&quot;#[message.inboundProperties.'http.query.params'.code]&quot;
+}"
+			doc:name="Set Payload" />
+		<logger message="#[payload]" level="INFO" doc:name="Logger" />
+	</flow>
 
 </mule>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+<http:listener-config name="listenerConfig" host="localhost" port="8082" doc:name="HTTP Listener Configuration"/>
+<http:request-config name="HTTP_Request_Configuration" host="localhost" port="8081" doc:name="HTTP Request Configuration"/>
+    <flow name="oauth-client-exampleFlow">
+        <http:listener  path="/oauthtoken" doc:name="HTTP" allowedMethods="GET" config-ref="listenerConfig"/>
+        <set-payload value="username=omsaieswar&amp;password=omsaieswar&amp;client_id=eswar&amp;response_type=code&amp;redirect_uri=http://localhost:8081/&amp;scope=USER" encoding="UTF-8" mimeType="application/x-www-form-urlencoded" doc:name="Set Payload"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="oauth/authorize?response_type=code&amp;client_id=eswar&amp;redirect_uri=http://localhost:8081/&amp;scope=USER" method="POST" doc:name="HTTP"/>
+        <logger message="#[message]" level="INFO" doc:name="Logger"/>
+    </flow>
+
+</mule>
