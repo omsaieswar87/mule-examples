@@ -1,20 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
 
-<http:listener-config name="listenerConfig" host="localhost" port="8082" doc:name="HTTP Listener Configuration"/>
-<http:request-config name="HTTP_Request_Configuration" host="localhost" port="8081" doc:name="HTTP Request Configuration"/>
-    <flow name="oauth-client-exampleFlow">
-        <http:listener  path="/oauthtoken" doc:name="HTTP" allowedMethods="GET" config-ref="listenerConfig"/>
-        <set-payload value="username=omsaieswar&amp;password=omsaieswar&amp;client_id=eswar&amp;response_type=code&amp;redirect_uri=http://localhost:8081/&amp;scope=USER" encoding="UTF-8" mimeType="application/x-www-form-urlencoded" doc:name="Set Payload"/>
-        <http:request config-ref="HTTP_Request_Configuration" path="oauth/authorize?response_type=code&amp;client_id=eswar&amp;redirect_uri=http://localhost:8081/&amp;scope=USER" method="POST" doc:name="HTTP"/>
-        <logger message="#[message]" level="INFO" doc:name="Logger"/>
-    </flow>
+	<http:listener-config name="listenerConfig" host="localhost"
+		port="8082" doc:name="HTTP Listener Configuration" />
+	<http:request-config name="HTTP_Request_Configuration"
+		host="localhost" port="8081" doc:name="HTTP Request Configuration" />
+	<flow name="oauth-client-exampleFlow">
+		<http:listener path="/oauthtoken" doc:name="HTTP"
+			allowedMethods="GET" config-ref="listenerConfig" />
+		<set-payload
+			value="username=omsaieswar&amp;password=omsaieswar&amp;client_id=eswar&amp;response_type=code&amp;redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FgetCode&amp;scope=USER"
+			encoding="UTF-8" mimeType="application/x-www-form-urlencoded"
+			doc:name="Set Payload" />
+		<http:request config-ref="HTTP_Request_Configuration"
+			path="/oauth/authorize" method="POST" doc:name="HTTP">
+			<http:request-builder>
+				<http:query-param paramName="response_type" value="code" />
+				<http:query-param paramName="scope" value="USER" />
+				<http:query-param paramName="client_id" value="eswar" />
+				<http:query-param paramName="redirect_uri"
+					value="http://localhost:8081/getCode" />
+			</http:request-builder>
+			<http:success-status-code-validator
+				values="200" />
+		</http:request>
+		<logger message="code ---> #[json:code]" level="INFO" doc:name="Logger" />
+		<http:request config-ref="HTTP_Request_Configuration"
+			path="/oauth/token" method="GET" doc:name="HTTP1">
+			<http:request-builder>
+				<http:query-param paramName="response_type" value="access_token" />
+				<http:query-param paramName="client_id" value="eswar" />
+				<http:query-param paramName="code" value="#[json:code]" />
+				<http:query-param paramName="grant_type" value="AUTHORIZATION_CODE" />
+				<http:query-param paramName="client_secret" value="eswar" />
+				<http:query-param paramName="redirect_uri"
+					value="http://localhost:8081/getCode" />
+			</http:request-builder>
+		</http:request>
+		<catch-exception-strategy doc:name="Catch Exception Strategy">
+			<set-payload
+				value="{
+&quot;message&quot;:&quot;error&quot;,
+&quot;rootcause&quot;:&quot;#[message.exception.cause]&quot;
+}"
+				doc:name="Set Payload" />
+		</catch-exception-strategy>
+	</flow>
+	<flow name="oauth-test-token-flow">
+		<http:listener config-ref="listenerConfig" path="/testToken"
+			doc:name="HTTP" />
+		<flow-ref name="oauth-client-exampleFlow" doc:name="Flow Reference" />
+		<http:request config-ref="HTTP_Request_Configuration"
+			path="/validate" method="GET" doc:name="HTTP">
+			<http:request-builder>
+				<http:query-param paramName="access_token" value="#[json:access_token]" />
+			</http:request-builder>
+		</http:request>
+
+		<set-payload value="Successfully authenticated" doc:name="Set Payload" />
+	</flow>
 
 </mule>
